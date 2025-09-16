@@ -31,18 +31,18 @@ import tools.aqua.konstraints.util.Stack
 class Z3Context {
   val context = Context()
 
-  internal val constants = HashMap<String, Expr<*>>()
-  internal val functions = HashMap<String, FuncDecl<*>>()
+  internal val constants = HashMap<String, Expr>()
+  internal val functions = HashMap<String, FuncDecl>()
   internal val sorts = HashMap<Sort, Z3Sort>()
-  private val letStack = Stack<Map<String, Expr<*>>>()
-  private val boundVars = Stack<Map<String, Expr<*>>>()
+  private val letStack = Stack<Map<String, Expr>>()
+  private val boundVars = Stack<Map<String, Expr>>()
 
   /** Create Z3 expressions for all local variables in [bindings]. */
   fun <T> let(bindings: List<VarBinding<*>>, block: () -> T): T {
     letStack.push(
         mapOf(
             *bindings
-                .map { binding -> binding.name.toString() to binding.term.z3ify(this) }
+                .map { binding -> binding.name.toString().to(binding.term.z3ify(this) as Expr) }
                 .toTypedArray()))
 
     val expr = block()
@@ -52,7 +52,7 @@ class Z3Context {
     return expr
   }
 
-  fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr<*>>) -> T): T {
+  fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr>) -> T): T {
     boundVars.push(
         mapOf(
             *sortedVars
@@ -75,7 +75,7 @@ class Z3Context {
    * @throws RuntimeException if the local variable is unknown
    * @throws RuntimeException if the local variable is not of sort [T]
    */
-  fun <T : Z3Sort> localVariable(symbol: Symbol, sort: T): Expr<T> {
+  fun <T : Z3Sort> localVariable(symbol: Symbol, sort: T): Expr {
     val level =
         letStack.find { it.containsKey(symbol.toString()) }
             ?: throw RuntimeException("Unknown local variable $symbol")
@@ -89,10 +89,10 @@ class Z3Context {
             "Local variable $symbol had unexpected sort: expected $sort but was ${localVar.sort}")
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
-    @Suppress("UNCHECKED_CAST") return localVar as Expr<T>
+    @Suppress("UNCHECKED_CAST") return localVar as Expr
   }
 
-  fun <T : Z3Sort> boundVariable(symbol: Symbol, sort: T): Expr<T> {
+  fun <T : Z3Sort> boundVariable(symbol: Symbol, sort: T): Expr {
     val level =
         boundVars.find { it.containsKey(symbol.toString()) }
             ?: throw RuntimeException("Unknown local variable $symbol")
@@ -106,10 +106,10 @@ class Z3Context {
             "Bound variable $symbol had unexpected sort: expected $sort but was ${boundVar.sort}")
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
-    @Suppress("UNCHECKED_CAST") return boundVar as Expr<T>
+    @Suppress("UNCHECKED_CAST") return boundVar as Expr
   }
 
-  fun <T : Z3Sort> getConstant(symbol: Symbol, sort: T): Expr<T> {
+  fun <T : Z3Sort> getConstant(symbol: Symbol, sort: T): Expr {
     val constant = constants[symbol.toString()] ?: throw UnknownFunctionException(symbol)
 
     if (constant.sort != sort) {
@@ -117,10 +117,10 @@ class Z3Context {
           "Constant $symbol had unexpected sort: expected $sort but was ${constant.sort}")
     }
 
-    @Suppress("UNCHECKED_CAST") return constant as Expr<T>
+    @Suppress("UNCHECKED_CAST") return constant as Expr
   }
 
-  fun <T : Z3Sort> getConstantOrNull(symbol: Symbol, sort: T): Expr<T>? =
+  fun <T : Z3Sort> getConstantOrNull(symbol: Symbol, sort: T): Expr? =
       try {
         getConstant(symbol, sort)
       } catch (e: UnexpectedSortException) {
@@ -130,7 +130,7 @@ class Z3Context {
         null
       }
 
-  fun <T : Z3Sort> getFunction(symbol: Symbol, args: List<Expr<*>>, sort: T): Expr<T> {
+  fun <T : Z3Sort> getFunction(symbol: Symbol, args: List<Expr>, sort: T): Expr {
     val functionDef = functions[symbol.toString()] ?: throw UnknownFunctionException(symbol)
 
     val function = functionDef.apply(*args.toTypedArray())
@@ -140,10 +140,10 @@ class Z3Context {
           "Function $symbol had unexpected sort: expected $sort but was ${function.sort}")
     }
 
-    @Suppress("UNCHECKED_CAST") return function as Expr<T>
+    @Suppress("UNCHECKED_CAST") return function as Expr
   }
 
-  fun <T : Z3Sort> getFunctionOrNull(symbol: Symbol, args: List<Expr<*>>, sort: T): Expr<T>? =
+  fun <T : Z3Sort> getFunctionOrNull(symbol: Symbol, args: List<Expr>, sort: T): Expr? =
       try {
         getFunction(symbol, args, sort)
       } catch (e: UnexpectedSortException) {
