@@ -673,8 +673,38 @@ object Parser {
 
   // TODO missing commands
 
-  // Command responses
-  // TODO
+  // Responses
+
+    private val satResponse = of("sat").map { _: Any -> ProtoSat }
+    private val unsatResponse = of("unsat").map { _: Any -> ProtoUnsat }
+    private val unknownResponse = of("unknown").map { _: Any -> ProtoUnknown }
+
+    private val modelKW = of("model") trim whitespaceCat
+
+    private val modelResponse =
+        (lparen * modelKW * defineFunCMD.star() * rparen).map { results: List<Any> ->
+          ProtoModel(results[2] as List<ProtoDefineFun>)
+        }
+
+    private val interpolantsKW = of("interpolants") trim whitespaceCat
+
+    private val interpolantsResponse =
+        (lparen * interpolantsKW * term.star() * rparen).map { results: List<Any> ->
+            ProtoInterpolants(results[2] as List<ProtoTerm>)
+        }
+
+    // Combined response parser
+    val response =
+        ChoiceParser(
+            FailureJoiner.SelectFarthest(),
+            satResponse,
+            unsatResponse,
+            unknownResponse,
+            modelResponse,
+            interpolantsResponse
+        )
+
+    // TODO missing responses
 
   fun parse(program: String): SMTProgram {
     val parseTreeVisitor = ParseTreeVisitor()
@@ -708,6 +738,30 @@ object Parser {
         parseTreeVisitor.context!!)
   }
 
+    fun parseResponse(response: String, context: Context): List<Any> {
+        val parseTreeVisitor = ParseTreeVisitor()
+        parseTreeVisitor.context = context
+        // parseTreeVisitor.context = Context(LIA)
+        val responses = splitInput(response)
+        val protoResponses = responses.map {
+            val temp = this.response.parse(it)
+
+            if (temp.isSuccess) {
+                temp
+            } else {
+                throw ParseException(temp.message, temp.position, temp.buffer)
+            }
+        }
+        return protoResponses
+            .map { result -> result.get<Any>() }
+            .map { resp ->
+                when (resp) {
+                    is ProtoResponse -> parseTreeVisitor.visit(resp)
+                    else -> throw IllegalStateException("Illegal type in parse tree $resp!")
+                }
+            }
+    }
+
   private fun splitInput(program: String): List<String> {
     val commands = mutableListOf<String>()
     var count = 0
@@ -726,6 +780,14 @@ object Parser {
         if (count == 0) {
           commands.add(program.substring(position, index + 1))
         }
+      } else if (count == 0 && !c.isWhitespace()) {
+          // response outside of parentheses
+          position = index
+          count = -1
+      } else if (count == -1 && c.isWhitespace()) {
+          // end of response outside of parentheses
+          commands.add(program.substring(position, index))
+          count = 0
       }
     }
 

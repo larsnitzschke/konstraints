@@ -77,7 +77,9 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
 
 /** SMT (set-logic [logic]) command */
-data class SetLogic(val logic: Logic) : Command("set-logic $logic")
+data class SetLogic(val logic: Logic) : Command("set-logic $logic") {
+    override fun toString(): String = super.toString()
+}
 
 /** SMT (define-fun [functionDef]) command */
 data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {

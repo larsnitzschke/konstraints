@@ -24,7 +24,7 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 internal class ParseTreeVisitor :
-    ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
+    ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor, ProtoResponseVisitor {
 
   var context: Context? = null
 
@@ -223,5 +223,27 @@ internal class ParseTreeVisitor :
 
   override fun visit(decimalConstant: DecimalConstant): Expression<*> {
     return RealLiteral(decimalConstant.decimal)
+  }
+
+  override fun visit(protoSat: ProtoSat): SatStatus {
+    return SatStatus.SAT
+  }
+
+  override fun visit(protoUnsat: ProtoUnsat): SatStatus {
+    return SatStatus.UNSAT
+  }
+
+  override fun visit(protoUnknown: ProtoUnknown): SatStatus {
+    return SatStatus.UNKNOWN
+  }
+
+  override fun visit(protoModel: ProtoModel): Model {
+    val funcDefs = protoModel.defineFuns.map { visit(it) }.map { it.functionDef }
+    return Model(funcDefs)
+  }
+
+  override fun visit(protoInterpolants: ProtoInterpolants): Interpolants {
+    val terms = protoInterpolants.interpolants.map { visit(it) as Expression<BoolSort> }
+    return Interpolants(terms)
   }
 }

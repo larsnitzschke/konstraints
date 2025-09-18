@@ -135,3 +135,24 @@ internal interface ProtoTermVisitor {
 
   fun visit(protoAnnotation: ProtoAnnotation): Expression<*>
 }
+
+internal interface ProtoResponseVisitor {
+  fun visit(response: ProtoResponse): Any =
+      when (response) {
+        is ProtoSat -> visit(response)
+        is ProtoUnsat -> visit(response)
+        is ProtoUnknown -> visit(response)
+        is ProtoModel -> visit(response)
+        is ProtoInterpolants -> visit(response)
+      }
+
+  fun visit(protoSat: ProtoSat): SatStatus
+
+  fun visit(protoUnsat: ProtoUnsat): SatStatus
+
+  fun visit(protoUnknown: ProtoUnknown): SatStatus
+
+  fun visit(protoModel: ProtoModel): Model
+
+  fun visit(protoInterpolants: ProtoInterpolants): Interpolants
+}

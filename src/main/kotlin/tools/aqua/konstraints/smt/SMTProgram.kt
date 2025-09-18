@@ -18,9 +18,11 @@
 
 package tools.aqua.konstraints.smt
 
+import com.lordcodes.turtle.shellRun
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.solvers.z3.Z3Solver
+import kotlin.io.path.pathString
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -55,7 +57,7 @@ abstract class SMTProgram(commands: List<Command>, var context: Context?) {
   /*
    * currently uses Z3 to solve eventually use an abstract Solver interface
    */
-  fun solve() {
+  open fun solve() {
     val solver = Z3Solver()
 
     solver.use {
@@ -134,3 +136,33 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
 }
 
 class DefaultSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context)
+
+/**
+ * An SMT program that supports interpolation
+ *
+ * Note: Requires an installation of Z3 as it just call it per commandline
+ */
+class InterpolatingSMTProgram(
+    commands: List<Command>,
+    context: Context) : SMTProgram(commands, context) {
+      constructor(smtProgram: SMTProgram) : this(smtProgram.commands, smtProgram.context!!) {
+        this.logic = smtProgram.logic
+      }
+
+      override fun solve() {
+         // Write program to a temp file
+        val tempFile = kotlin.io.path.createTempFile(suffix = ".smt2")
+        tempFile.toFile().writeText(commands.joinToString("\n") { it.toString() })
+
+        // Call the z3 binary with the file as input
+        val output = shellRun("z3", listOf(tempFile.pathString))
+        println(output)
+
+        // Parse the output
+
+        // Delete the temp file
+        tempFile.toFile().deleteOnExit()
+
+      }
+}
+
