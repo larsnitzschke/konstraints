@@ -81,9 +81,10 @@ dependencies {
   implementation(libs.commons.io)
   implementation(libs.kotlin.coroutines)
   implementation(libs.petitparser.core)
-  implementation(
-      fileTree(mapOf("dir" to "../z3-turnkey/build/libs", "include" to listOf("z3-turnkey-*.jar"))))
-
+  implementation("com.lordcodes.turtle:turtle:0.9.0")
+  // implementation(fileTree(mapOf("dir" to "../z3-turnkey/build/libs", "include" to
+  // listOf("z3-turnkey-*.jar"))))
+  implementation(libs.z3.turnkey)
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.kotlin.serialization.json)
