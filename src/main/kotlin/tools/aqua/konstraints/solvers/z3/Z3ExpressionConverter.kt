@@ -23,9 +23,9 @@ import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
-import tools.aqua.konstraints.smt.*
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
@@ -57,25 +57,21 @@ fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
       Equals(*this.args.map { it.aquaify() }.toTypedArray())
     } else if (isGE) {
       IntGreaterEq(
-        this.args[0].aquaify() as Expression<IntSort>,
-        this.args[1].aquaify() as Expression<IntSort>
-      )
+          this.args[0].aquaify() as Expression<IntSort>,
+          this.args[1].aquaify() as Expression<IntSort>)
     } else if (isLE) {
       IntLessEq(
-        this.args[0].aquaify() as Expression<IntSort>,
-        this.args[1].aquaify() as Expression<IntSort>
-      )
+          this.args[0].aquaify() as Expression<IntSort>,
+          this.args[1].aquaify() as Expression<IntSort>)
     } else if (isAnd) {
       And(
-        this.args[0].aquaify() as Expression<BoolSort>,
-        this.args[1].aquaify() as Expression<BoolSort>
-      )
+          this.args[0].aquaify() as Expression<BoolSort>,
+          this.args[1].aquaify() as Expression<BoolSort>)
     } else if (isNot) {
-      Not(
-        this.args[0].aquaify() as Expression<BoolSort>
-      )
+      Not(this.args[0].aquaify() as Expression<BoolSort>)
     } else {
-      throw RuntimeException("Unknown or unsupported bool expression $this of class ${this.javaClass.getName()}")
+      throw RuntimeException(
+          "Unknown or unsupported bool expression $this of class ${this.javaClass.getName()}")
     }
 
 @JvmName("aquaifyInt")
@@ -85,12 +81,10 @@ fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
     } else if (isIntNum) {
       IntLiteral((this as IntNum).bigInteger)
     } else if (isConst) {
-      UserDeclaredExpression(
-        Symbol(this.sExpr),
-        IntSort
-      )
+      UserDeclaredExpression(Symbol(this.sExpr), IntSort)
     } else {
-      throw RuntimeException("Unknown or unsupported int expression $this  of class ${this.javaClass.getName()}")
+      throw RuntimeException(
+          "Unknown or unsupported int expression $this  of class ${this.javaClass.getName()}")
     }
 
 @JvmName("aquaifyBitVec")
