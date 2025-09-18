@@ -41,9 +41,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     return status
   }
 
-  fun simplify(ctx: List<Command>, term: Expression<BoolSort>): Expression<BoolSort> {
+  fun simplify(ctx : List<Command>, term: Expression<BoolSort>): Expression<BoolSort> {
     ctx.forEach { visit(it) }
-    val termSimplified = term.z3ify(context).simplify().aquaify() as Expression<BoolSort>
+    val termSimplified = term.z3ify(context).simplify().aquaify()
 
     return termSimplified
   }
