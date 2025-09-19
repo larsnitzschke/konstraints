@@ -738,10 +738,11 @@ object Parser {
         parseTreeVisitor.context!!)
   }
 
-    fun parseResponse(response: String, context: Context): List<Any> {
+    fun parseResponse(response: String, interpolationContext: Context): List<Any> {
+        val parseTreeVisitorWithContext = ParseTreeVisitor()
+        parseTreeVisitorWithContext.context = interpolationContext
         val parseTreeVisitor = ParseTreeVisitor()
-        parseTreeVisitor.context = context
-        // parseTreeVisitor.context = Context(LIA)
+        parseTreeVisitor.context = Context(interpolationContext.logic)
         val responses = splitInput(response)
         val protoResponses = responses.map {
             val temp = this.response.parse(it)
@@ -756,6 +757,7 @@ object Parser {
             .map { result -> result.get<Any>() }
             .map { resp ->
                 when (resp) {
+                    is ProtoInterpolants -> parseTreeVisitorWithContext.visit(resp)
                     is ProtoResponse -> parseTreeVisitor.visit(resp)
                     else -> throw IllegalStateException("Illegal type in parse tree $resp!")
                 }
