@@ -36,6 +36,7 @@ interface CommandVisitor<T> {
         is DefineFun -> visit(command)
         is Pop -> visit(command)
         is Push -> visit(command)
+        is ComputeInterpolant -> visit(command)
       }
 
   fun visit(assert: Assert): T
@@ -63,4 +64,6 @@ interface CommandVisitor<T> {
   fun visit(push: Push): T
 
   fun visit(pop: Pop): T
+
+    fun visit(computeInterpolant: ComputeInterpolant): T
 }

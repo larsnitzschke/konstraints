@@ -109,6 +109,11 @@ internal class ParseTreeVisitor :
     return Pop(protoPop.n)
   }
 
+  override fun visit(protoComputeInterpolant: ProtoComputeInterpolant): ComputeInterpolant {
+    val terms = protoComputeInterpolant.terms.map { visit(it) as Expression<BoolSort> }
+    return ComputeInterpolant(terms)
+  }
+
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context?.getFunction(simpleQualIdentifier.identifier, listOf())
 

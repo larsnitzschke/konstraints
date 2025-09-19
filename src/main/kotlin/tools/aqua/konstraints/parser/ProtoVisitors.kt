@@ -32,6 +32,7 @@ internal interface ProtoCommandVisitor {
         is ProtoDefineFun -> visit(command)
         is ProtoPop -> visit(command)
         is ProtoPush -> visit(command)
+        is ProtoComputeInterpolant -> visit(command)
       }
 
   fun visit(protoAssert: ProtoAssert): Assert
@@ -53,6 +54,8 @@ internal interface ProtoCommandVisitor {
   fun visit(protoPush: ProtoPush): Push
 
   fun visit(protoPop: ProtoPop): Pop
+
+  fun visit(protoComputeInterpolant: ProtoComputeInterpolant): ComputeInterpolant
 }
 
 internal interface SpecConstantVisitor {

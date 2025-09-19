@@ -46,12 +46,12 @@ class Testing {
             "(get-model)\n" +
             "\n" +
             "\n" +
-            // "(compute-interpolant\n" + TODO: Add support for compute-interpolant
-            // "   (and (= a b) (= a c))\n" +
-            // "   (and (= b d) (not (= c d))))
+            "(compute-interpolant\n" +
+            "   (and (= a b) (= a c))\n" +
+            "   (and (= b d) (not (= c d))))" +
             ""
     val prog = InterpolatingSMTProgram(Parser.parse(program))
-    print(prog.context)
+    print(prog.commands)
     val response = "sat\n" +
             "(model \n" +
             "  (define-fun b () Int\n" +

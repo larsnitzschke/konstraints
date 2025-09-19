@@ -61,6 +61,8 @@ internal data class ProtoPush(val n: Int) : ProtoCommand
 
 internal data class ProtoPop(val n: Int) : ProtoCommand
 
+internal data class ProtoComputeInterpolant(val terms: List<ProtoTerm>) : ProtoCommand
+
 internal class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
   val symbol: String = token.getValue()
 }

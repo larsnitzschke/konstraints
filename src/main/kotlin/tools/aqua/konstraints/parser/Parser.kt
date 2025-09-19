@@ -106,6 +106,7 @@ object Parser {
   private val setInfoKW = of("set-info") trim whitespaceCat
   private val setLogicKW = of("set-logic") trim whitespaceCat
   private val setOptionKW = of("set-option") trim whitespaceCat
+  private val computeInterpolantsKW = of("compute-interpolant") trim whitespaceCat
 
   internal val reservedCommands =
       (assertKW +
@@ -136,7 +137,8 @@ object Parser {
               resetAssertionsKW +
               setInfoKW +
               setLogicKW +
-              setOptionKW)
+              setOptionKW +
+              computeInterpolantsKW)
           .token()
 
   // Tokens: Other tokens
@@ -648,6 +650,11 @@ object Parser {
         ProtoPush((results[2] as String).toInt())
       }
 
+  private val computeInterpolantCMD =
+        (lparen * computeInterpolantsKW * term.plus() * rparen).map { results: ArrayList<Any> ->
+            ProtoComputeInterpolant(results[2] as List<ProtoTerm>)
+        }
+
   private val popCMD =
       (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> ->
         ProtoPop((results[2] as String).toInt())
@@ -667,7 +674,8 @@ object Parser {
           getModelCMD,
           defineFunCMD,
           pushCMD,
-          popCMD)
+          popCMD,
+          computeInterpolantCMD)
 
   val script = command.star().end()
 

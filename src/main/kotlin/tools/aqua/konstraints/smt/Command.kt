@@ -112,3 +112,8 @@ data class FunctionDef<S : Sort>(
 data class Push(val n: Int) : Command("push $n")
 
 data class Pop(val n: Int) : Command("pop $n")
+
+data class ComputeInterpolant(val terms: List<Expression<BoolSort>>) :
+    Command("compute-interpolant ${terms.joinToString(" ")}") {
+        override fun toString(): String = super.toString()
+    }
