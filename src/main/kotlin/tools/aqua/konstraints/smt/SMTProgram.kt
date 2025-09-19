@@ -136,29 +136,26 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
 
 class DefaultSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context)
 
-/**
- * An SMT program that supports interpolation
- */
-class InterpolatingSMTProgram(
-    commands: List<Command>,
-    context: Context) : SMTProgram(commands, context) {
-      var interpolant: Interpolants? = null
-      constructor(smtProgram: SMTProgram) : this(smtProgram.commands, smtProgram.context!!) {
-        this.logic = smtProgram.logic
-      }
+/** An SMT program that supports interpolation */
+class InterpolatingSMTProgram(commands: List<Command>, context: Context) :
+    SMTProgram(commands, context) {
+  var interpolant: Interpolants? = null
 
-      override fun solve() {
-        val solver = ShellZ3Solver()
-        solver.use {
-          status = solver.solve(this)
+  constructor(smtProgram: SMTProgram) : this(smtProgram.commands, smtProgram.context!!) {
+    this.logic = smtProgram.logic
+  }
 
-          if (solver.isModelAvailable()) {
-            model = solver.getModel()
-          }
-          if (solver.isInterpolantAvailable()) {
-            interpolant = solver.getInterpolant()
-          }
-        }
+  override fun solve() {
+    val solver = ShellZ3Solver()
+    solver.use {
+      status = solver.solve(this)
+
+      if (solver.isModelAvailable()) {
+        model = solver.getModel()
       }
+      if (solver.isInterpolantAvailable()) {
+        interpolant = solver.getInterpolant()
+      }
+    }
+  }
 }
-

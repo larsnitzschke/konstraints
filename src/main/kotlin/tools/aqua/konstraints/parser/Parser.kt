@@ -651,9 +651,9 @@ object Parser {
       }
 
   private val computeInterpolantCMD =
-        (lparen * computeInterpolantsKW * term.plus() * rparen).map { results: ArrayList<Any> ->
-            ProtoComputeInterpolant(results[2] as List<ProtoTerm>)
-        }
+      (lparen * computeInterpolantsKW * term.plus() * rparen).map { results: ArrayList<Any> ->
+        ProtoComputeInterpolant(results[2] as List<ProtoTerm>)
+      }
 
   private val popCMD =
       (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> ->
@@ -683,36 +683,35 @@ object Parser {
 
   // Responses
 
-    private val satResponse = of("sat").map { _: Any -> ProtoSat }
-    private val unsatResponse = of("unsat").map { _: Any -> ProtoUnsat }
-    private val unknownResponse = of("unknown").map { _: Any -> ProtoUnknown }
+  private val satResponse = of("sat").map { _: Any -> ProtoSat }
+  private val unsatResponse = of("unsat").map { _: Any -> ProtoUnsat }
+  private val unknownResponse = of("unknown").map { _: Any -> ProtoUnknown }
 
-    private val modelKW = of("model") trim whitespaceCat
+  private val modelKW = of("model") trim whitespaceCat
 
-    private val modelResponse =
-        (lparen * modelKW * defineFunCMD.star() * rparen).map { results: List<Any> ->
-          ProtoModel(results[2] as List<ProtoDefineFun>)
-        }
+  private val modelResponse =
+      (lparen * modelKW * defineFunCMD.star() * rparen).map { results: List<Any> ->
+        ProtoModel(results[2] as List<ProtoDefineFun>)
+      }
 
-    private val interpolantsKW = of("interpolants") trim whitespaceCat
+  private val interpolantsKW = of("interpolants") trim whitespaceCat
 
-    private val interpolantsResponse =
-        (lparen * interpolantsKW * term.star() * rparen).map { results: List<Any> ->
-            ProtoInterpolants(results[2] as List<ProtoTerm>)
-        }
+  private val interpolantsResponse =
+      (lparen * interpolantsKW * term.star() * rparen).map { results: List<Any> ->
+        ProtoInterpolants(results[2] as List<ProtoTerm>)
+      }
 
-    // Combined response parser
-    val response =
-        ChoiceParser(
-            FailureJoiner.SelectFarthest(),
-            satResponse,
-            unsatResponse,
-            unknownResponse,
-            modelResponse,
-            interpolantsResponse
-        )
+  // Combined response parser
+  val response =
+      ChoiceParser(
+          FailureJoiner.SelectFarthest(),
+          satResponse,
+          unsatResponse,
+          unknownResponse,
+          modelResponse,
+          interpolantsResponse)
 
-    // TODO missing responses
+  // TODO missing responses
 
   fun parse(program: String): SMTProgram {
     val parseTreeVisitor = ParseTreeVisitor()
@@ -746,31 +745,32 @@ object Parser {
         parseTreeVisitor.context!!)
   }
 
-    fun parseResponse(response: String, interpolationContext: Context): List<Any> {
-        val parseTreeVisitorWithContext = ParseTreeVisitor()
-        parseTreeVisitorWithContext.context = interpolationContext
-        val parseTreeVisitor = ParseTreeVisitor()
-        parseTreeVisitor.context = Context(interpolationContext.logic)
-        val responses = splitInput(response)
-        val protoResponses = responses.map {
-            val temp = this.response.parse(it)
+  fun parseResponse(response: String, interpolationContext: Context): List<Any> {
+    val parseTreeVisitorWithContext = ParseTreeVisitor()
+    parseTreeVisitorWithContext.context = interpolationContext
+    val parseTreeVisitor = ParseTreeVisitor()
+    parseTreeVisitor.context = Context(interpolationContext.logic)
+    val responses = splitInput(response)
+    val protoResponses =
+        responses.map {
+          val temp = this.response.parse(it)
 
-            if (temp.isSuccess) {
-                temp
-            } else {
-                throw ParseException(temp.message, temp.position, temp.buffer)
-            }
+          if (temp.isSuccess) {
+            temp
+          } else {
+            throw ParseException(temp.message, temp.position, temp.buffer)
+          }
         }
-        return protoResponses
-            .map { result -> result.get<Any>() }
-            .map { resp ->
-                when (resp) {
-                    is ProtoInterpolants -> parseTreeVisitorWithContext.visit(resp)
-                    is ProtoResponse -> parseTreeVisitor.visit(resp)
-                    else -> throw IllegalStateException("Illegal type in parse tree $resp!")
-                }
-            }
-    }
+    return protoResponses
+        .map { result -> result.get<Any>() }
+        .map { resp ->
+          when (resp) {
+            is ProtoInterpolants -> parseTreeVisitorWithContext.visit(resp)
+            is ProtoResponse -> parseTreeVisitor.visit(resp)
+            else -> throw IllegalStateException("Illegal type in parse tree $resp!")
+          }
+        }
+  }
 
   private fun splitInput(program: String): List<String> {
     val commands = mutableListOf<String>()
@@ -791,13 +791,13 @@ object Parser {
           commands.add(program.substring(position, index + 1))
         }
       } else if (count == 0 && !c.isWhitespace()) {
-          // response outside of parentheses
-          position = index
-          count = -1
+        // response outside of parentheses
+        position = index
+        count = -1
       } else if (count == -1 && c.isWhitespace()) {
-          // end of response outside of parentheses
-          commands.add(program.substring(position, index))
-          count = 0
+        // end of response outside of parentheses
+        commands.add(program.substring(position, index))
+        count = 0
       }
     }
 

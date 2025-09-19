@@ -24,7 +24,11 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 internal class ParseTreeVisitor :
-    ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor, ProtoResponseVisitor {
+    ProtoCommandVisitor,
+    ProtoTermVisitor,
+    ProtoSortVisitor,
+    SpecConstantVisitor,
+    ProtoResponseVisitor {
 
   var context: Context? = null
 

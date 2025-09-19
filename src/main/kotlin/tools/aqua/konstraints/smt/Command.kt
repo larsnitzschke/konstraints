@@ -78,7 +78,7 @@ data class SetOption(val name: String, val value: OptionValue) : Command("set-op
 
 /** SMT (set-logic [logic]) command */
 data class SetLogic(val logic: Logic) : Command("set-logic $logic") {
-    override fun toString(): String = super.toString()
+  override fun toString(): String = super.toString()
 }
 
 /** SMT (define-fun [functionDef]) command */
@@ -115,5 +115,5 @@ data class Pop(val n: Int) : Command("pop $n")
 
 data class ComputeInterpolant(val terms: List<Expression<BoolSort>>) :
     Command("compute-interpolant ${terms.joinToString(" ")}") {
-        override fun toString(): String = super.toString()
-    }
+  override fun toString(): String = super.toString()
+}

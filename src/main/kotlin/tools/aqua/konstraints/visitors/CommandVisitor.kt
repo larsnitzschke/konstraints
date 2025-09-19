@@ -65,5 +65,5 @@ interface CommandVisitor<T> {
 
   fun visit(pop: Pop): T
 
-    fun visit(computeInterpolant: ComputeInterpolant): T
+  fun visit(computeInterpolant: ComputeInterpolant): T
 }
