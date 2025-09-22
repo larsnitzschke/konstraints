@@ -21,11 +21,14 @@ package tools.aqua.konstraints.solvers.z3
 import com.lordcodes.turtle.shellRun
 import java.nio.file.Path
 import kotlin.io.path.pathString
+import kotlin.io.path.readText
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.smt.AUFLIA
 import tools.aqua.konstraints.smt.Interpolants
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
+import tools.aqua.konstraints.smt.SetLogic
 import tools.aqua.konstraints.solvers.Solver
 
 /** A solver that calls Z3 as an external process using SMT-LIB2 format. */
@@ -45,13 +48,16 @@ class ShellZ3Solver : Solver {
   override fun solve(program: SMTProgram): SatStatus {
     // Write program to a temp file
     tempFiles.add(kotlin.io.path.createTempFile(suffix = ".smt2"))
-    tempFiles.last().toFile().writeText(program.commands.joinToString("\n") { it.toString() })
+    val setContextCommand = SetLogic(program.logic ?: program.context?.logic ?: AUFLIA)
+    val commandsString =
+        setContextCommand.toString() + program.commands.joinToString("\n") { it.toString() }
+    tempFiles.last().toFile().writeText(commandsString)
 
     // Call the z3 binary with the file as input
     val output = shellRun("z3", listOf(tempFiles.last().pathString))
 
     // Parse the output
-    val parsed = Parser.parseResponse(output, program.context!!)
+    val parsed = Parser.parseResponse(output, Parser.parse(tempFiles.last().readText()).context!!)
     status = parsed.lastOrNull { it is SatStatus } as? SatStatus ?: SatStatus.UNKNOWN
     model = parsed.lastOrNull { it is Model } as? Model
     interpolant = parsed.lastOrNull { it is Interpolants } as? Interpolants
