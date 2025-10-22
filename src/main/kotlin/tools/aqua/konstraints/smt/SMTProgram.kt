@@ -38,7 +38,7 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, var context: Context?) {
+abstract class SMTProgram(commands: List<Command>, var context: Context?, val verbose: Boolean = false) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
@@ -62,7 +62,7 @@ abstract class SMTProgram(commands: List<Command>, var context: Context?) {
     solver.use {
       status = solver.solve(this)
 
-      println(status)
+      if (verbose) println(status)
 
       if (solver.isModelAvailable()) {
         model = solver.getModel()
