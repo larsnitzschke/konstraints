@@ -38,7 +38,11 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, var context: Context?, val verbose: Boolean = false) {
+abstract class SMTProgram(
+    commands: List<Command>,
+    var context: Context?,
+    val verbose: Boolean = false
+) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
