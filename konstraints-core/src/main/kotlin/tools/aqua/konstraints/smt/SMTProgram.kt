@@ -24,6 +24,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import com.lordcodes.turtle.shellRun
 
 /** Sat status of an smt program. */
 enum class SatStatus {

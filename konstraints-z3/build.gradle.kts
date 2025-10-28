@@ -31,4 +31,5 @@ metadata {
 dependencies {
   implementation(project(":konstraints-core"))
   implementation(libs.z3.turnkey)
+  implementation("com.lordcodes.turtle:turtle:0.9.0")
 }

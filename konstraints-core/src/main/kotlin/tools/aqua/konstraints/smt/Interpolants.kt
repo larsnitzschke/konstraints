@@ -16,20 +16,9 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.kotlin-library")
-  id("konstraints.kotlin-static-analysis")
-  id("konstraints.maven-library")
-}
+package tools.aqua.konstraints.smt
 
-metadata {
-  name = "Konstraints Core"
-  description = "A library for working with SMT expressions on the JVM"
-}
-
-dependencies {
-  implementation(libs.kotlin.coroutines)
-  api(libs.petitparser.core)
-  implementation("com.lordcodes.turtle:turtle:0.9.0")
+data class Interpolants(val interpolants: List<Expression<BoolSort>>) {
+    override fun toString(): String =
+        "(interpolants ${interpolants.joinToString("\n") { it.toString() }})"
 }
