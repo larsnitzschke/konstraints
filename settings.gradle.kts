@@ -17,11 +17,15 @@
  */
 
 plugins {
-  id("com.gradle.develocity") version "3.17.6"
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+  id("com.gradle.develocity") version "4.1.1"
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 rootProject.name = "konstraints"
+
+include("konstraints-all", "konstraints-core", "konstraints-integration-tests")
+
+include(/*"konstraints-cvc5",*/ "konstraints-z3")
 
 develocity {
   buildScan {
