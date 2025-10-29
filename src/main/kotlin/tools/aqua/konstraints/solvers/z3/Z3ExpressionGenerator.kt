@@ -604,6 +604,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is StrIndexOf -> this.z3ify(context)
       is StrToCode -> this.z3ify(context)
       is StrToInt -> this.z3ify(context)
+      is ArraySelect -> (this as ArraySelect).z3ify(context) as Expr<Z3IntSort>
       /* free constant and function symbols */
       is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
