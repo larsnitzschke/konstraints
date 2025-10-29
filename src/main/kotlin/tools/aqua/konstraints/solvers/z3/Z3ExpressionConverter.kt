@@ -46,6 +46,7 @@ fun Expr<*>.aquaify(): Expression<*> =
       is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify() as Expression<Sort>
       is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify() as Expression<Sort>
       is BitVecSort -> (this as Expr<BitVecSort>).aquaify() as Expression<Sort>
+      is Z3ArraySort<*, *> -> (this as Expr<Z3ArraySort<*, *>>).aquaify() as Expression<Sort>
       else -> throw RuntimeException("Unknown or unsupported Z3 sort ${this.sort}")
     }
 
@@ -99,4 +100,21 @@ fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
       BVLiteral("#x${this.bigInteger.toString(16)}", this.sort.size)
     } else {
       throw RuntimeException("Unknown or unsupported bitvec expression $this")
+    }
+
+@JvmName("aquaifyArray")
+fun Expr<Z3ArraySort<*, *>>.aquaify(): Expression<ArraySort> =
+    if (isStore) {
+        ArrayStore(
+            this.args[0].aquaify() as Expression<ArraySort>,
+            this.args[1].aquaify(),
+            this.args[2].aquaify())
+    //} else if (isSelect) {
+    //    ArraySelect(
+    //        this.args[0].aquaify() as Expression<ArraySort>,
+    //        this.args[1].aquaify())
+    } else {
+      throw RuntimeException(
+          "Unknown or unsupported array expression $this") // constant array, default array,
+      // relation
     }
