@@ -25,6 +25,7 @@ import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
+import com.microsoft.z3.ArraySort as Z3ArraySort
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BVSort
@@ -35,6 +36,7 @@ fun Z3Sort.aquaify(): Sort =
       is Z3BoolSort -> BoolSort
       is Z3IntSort -> IntSort
       is BitVecSort -> BVSort(this.size)
+      is Z3ArraySort<*, *> -> ArraySort(this.getDomain().aquaify(), this.getRange().aquaify())
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $this")
     }
 
