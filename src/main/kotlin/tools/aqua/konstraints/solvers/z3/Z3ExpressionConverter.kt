@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.solvers.z3
 
+import com.microsoft.z3.ArraySort as Z3ArraySort
 import com.microsoft.z3.BitVecNum
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
@@ -25,7 +26,6 @@ import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
-import com.microsoft.z3.ArraySort as Z3ArraySort
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BVSort
