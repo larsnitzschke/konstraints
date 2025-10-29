@@ -105,14 +105,17 @@ fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
 @JvmName("aquaifyArray")
 fun Expr<Z3ArraySort<*, *>>.aquaify(): Expression<ArraySort> =
     if (isStore) {
-        ArrayStore(
-            this.args[0].aquaify() as Expression<ArraySort>,
-            this.args[1].aquaify(),
-            this.args[2].aquaify())
-    //} else if (isSelect) {
-    //    ArraySelect(
-    //        this.args[0].aquaify() as Expression<ArraySort>,
-    //        this.args[1].aquaify())
+      ArrayStore(
+          this.args[0].aquaify() as Expression<ArraySort>,
+          this.args[1].aquaify(),
+          this.args[2].aquaify())
+    } else if (isConstantArray) {
+      println("Check this: $this")
+      ConstantArray(this.sort.aquaify() as ArraySort, this.args[0].aquaify())
+      // } else if (isSelect) {
+      //    ArraySelect(
+      //        this.args[0].aquaify() as Expression<ArraySort>,
+      //        this.args[1].aquaify())
     } else {
       throw RuntimeException(
           "Unknown or unsupported array expression $this") // constant array, default array,

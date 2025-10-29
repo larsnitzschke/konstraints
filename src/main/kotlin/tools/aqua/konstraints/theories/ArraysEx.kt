@@ -119,3 +119,21 @@ object ArrayStoreDecl :
       bindings: Bindings
   ): Expression<ArraySort> = ArrayStore(param1, param2, param3)
 }
+
+/**
+ * Array constant operation
+ *
+ * (par (X Y) ((as const (Array X Y)) Y))
+ */
+class ConstantArray(val constantSort: ArraySort, val value: Expression<*>) :
+    UnaryExpression<ArraySort, Sort>("asConst".symbol(), constantSort) {
+  init {
+    require(sort.y == value.sort)
+  }
+
+  override val inner: Expression<Sort> = value as Expression<Sort>
+
+  override fun copy(children: List<Expression<*>>): Expression<ArraySort> {
+    TODO("Not yet implemented")
+  }
+}
